@@ -2,7 +2,7 @@
 
 ##Part 1: Data Munging
 
-Write a Nodejs program that converts the csv file into a json file that will be used to plot data in part 2. You have to come up with an optimal schema for the json file based on the requirements of Part 2.
+Write a Node.Js program that converts the CSV file into a JSON file that will be used to plot data in part 2. You have to come up with an optimal schema for the JSON file based on the requirements of Part 2.
 
 ##Part 2: Data Visualization with D3.js
 
