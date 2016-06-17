@@ -1,0 +1,25 @@
+.axis path, .axis line{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar{
+  fill: red;
+}
+
+.x .axis path{
+  display: none;
+}
+
+svg{
+  font-size: 0.7em;
+}
+
+.section{
+  margin: 0, auto;
+}
+
+.header{
+  margin-top: 20px;
+}

@@ -1,8 +1,8 @@
 var readline        = require('readline'),
     fs              = require('fs'),
-    inputFilePath   = "data/Crimes_-_2001_to_present.csv",
-    theftFilePath   = "json/theft.json",
-    assaultFilePath = "json/assault.json",
+    inputFilePath   = "Crimes_-_2001_to_present.csv",
+    theftFilePath   = "theft.json",
+    assaultFilePath = "assault.json",
     fileTheft = fs.openSync(theftFilePath,"w+"),
     fileAssault = fs.openSync(assaultFilePath,"w+"),
     lineCounter,
@@ -66,7 +66,7 @@ reader.on('open', function(){
 
       if (rowValues[5] == "THEFT," && rowValues[6].indexOf('$500') != -1) {
 
-        if(rowValues[6].indexOf('$500') != -1){
+        if(rowValues[6].toUpperCase().indexOf('UNDER') != -1){
           arTheft[index]['THEFT $500 AND UNDER']++;
           // console.log("THEFT $500 AND UNDER");
         }else {
