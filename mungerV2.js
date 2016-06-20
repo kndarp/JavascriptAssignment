@@ -3,8 +3,6 @@ var readline        = require('readline'),
     inputFilePath   = "Crimes_-_2001_to_present_1.csv",
     theftFilePath   = "theft.json",
     assaultFilePath = "assault.json",
-    fileTheft = fs.openSync(theftFilePath,"w+"),
-    fileAssault = fs.openSync(assaultFilePath,"w+"),
     lineCounter,
     arTheft = [],
     arAssault = [],
@@ -34,7 +32,9 @@ var readline        = require('readline'),
         arrested  : "ARRESTED",
         notArrested : "NOT ARRESTED",
         yearBound : 2001,
-        dollar500: "$500"
+        dollar500: "$500",
+        time: "Time Elapsed",
+        true: "TRUE"
     },
     regex             =  /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g,
     arHeader,
@@ -44,13 +44,10 @@ var readline        = require('readline'),
       strArrested : "Arrest",
       strYear : "Year"
     };
-    // regex2           = /(".*?"|[^",]+)(?=\s*,|\s*$)/g;
-    // regex           = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-
 
 //    On Opening file, add '[' to the beginning of the file and initialize file counter.
 reader.on('open', function(){
-    console.time("conversionTime");
+    console.time(statics.time);
     lineCounter = -1;
     initializeArrays();
   });
@@ -59,23 +56,10 @@ reader.on('open', function(){
     //    Create JSON objects of CSV rows and write them to file.
 csvConverter.on('line',function(line){
 
-
-    // console.log(line);
-
     //  Create JSON object from CSV Row
-
     var rowValues = line.split(regex);
-    // console.log(JSON.stringify(rowValues));
-    /*  Legend for Row Values
-    *
-    *   rowValues[5]  - Primary Type
-    *   rowValues[6]  - Description
-    *   rowValues[8]  - Arrest
-    *   rowValues[17] - Year
-    *
-    */
 
-    //  Increment line counter and skip for header row.
+    //  Increment line counter and get indices if header row.
     if(lineCounter++ < 0 ){
       arHeader = rowValues;
       for( var i=0; i<arHeader.length; i++){
@@ -92,7 +76,6 @@ csvConverter.on('line',function(line){
           case indices.strYear:
             indices.iYear = i;
             break;
-
         }
       }
       return;
@@ -101,28 +84,32 @@ csvConverter.on('line',function(line){
     //  Log line count
     console.log("Reading line ",lineCounter);
 
+    //  Extract year and index of Object to be updated.
     var year  = +(rowValues[indices.iYear]);
     index = year - statics.yearBound;
 
+    //  Switch Primary Type and perform required function
     switch (rowValues[indices.iPrimType]) {
       case statics.theft:  (iFound = rowValues[indices.iDesc].toUpperCase().indexOf(statics.dollar500)) != -1 && ((iFound == 0) ? arTheft[index][statics.under500]++ : arTheft[index][statics.over500]++);
                     break;
-      case statics.assault: (rowValues[indices.iArrest].toUpperCase().indexOf("TRUE") != -1) ? arAssault[index][statics.arrested]++ : arAssault[index][statics.notArrested]++;
+      case statics.assault: (rowValues[indices.iArrest].toUpperCase().indexOf(statics.true) != -1) ? arAssault[index][statics.arrested]++ : arAssault[index][statics.notArrested]++;
                     break;
     }
 
 });
 
-
-//    On end of input file, write objects to their respective files.
+//   On end of input file, write objects to their respective files.
 reader.on('end',function(){
+
+    var fileTheft     = fs.openSync(theftFilePath,"w+"),
+        fileAssault   = fs.openSync(assaultFilePath,"w+");
 
     console.log("======End of Input File======");
 
     fs.write(fileTheft,JSON.stringify(arTheft));
     fs.write(fileAssault,JSON.stringify(arAssault));
 
-    console.log("Total Records read : ",lineCounter);
-    console.timeEnd("conversionTime");
+    console.log("Total Records read: ",lineCounter);
+    console.timeEnd(statics.time);
 
 });
