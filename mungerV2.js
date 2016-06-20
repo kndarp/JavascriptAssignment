@@ -26,12 +26,24 @@ var readline        = require('readline'),
     csvConverter    = readline.createInterface({
       input   : reader
     }),
+    statics = {
+        theft : "THEFT",
+        assault : "ASSAULT",
+        under500 : "THEFT $500 AND UNDER",
+        over500 : "THEFT OVER $500",
+        arrested  : "ARRESTED",
+        notArrested : "NOT ARRESTED",
+        yearBound : 2001,
+        dollar500: "$500"
+    },
     regex             =  /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g,
     arHeader,
-    iPrimType,
-    iDesc,
-    iArrest,
-    iYear;
+    indices = {
+      strPrimaryType : "Primary Type",
+      strDesc : "Description",
+      strArrested : "Arrest",
+      strYear : "Year"
+    };
     // regex2           = /(".*?"|[^",]+)(?=\s*,|\s*$)/g;
     // regex           = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
 
@@ -68,17 +80,17 @@ csvConverter.on('line',function(line){
       arHeader = rowValues;
       for( var i=0; i<arHeader.length; i++){
         switch (arHeader[i]) {
-          case "Primary Type":
-            iPrimType = i;
+          case indices.strPrimaryType:
+            indices.iPrimType = i;
             break;
-          case "Description":
-            iDesc = i;
+          case indices.strDesc:
+            indices.iDesc = i;
             break;
-          case "Arrest":
-            iArrest = i;
+          case indices.strArrested:
+            indices.iArrest = i;
             break;
-          case "Year":
-            iYear = i;
+          case indices.strYear:
+            indices.iYear = i;
             break;
 
         }
@@ -89,29 +101,14 @@ csvConverter.on('line',function(line){
     //  Log line count
     console.log("Reading line ",lineCounter);
 
+    var year  = +(rowValues[indices.iYear]);
+    index = year - statics.yearBound;
 
-    var year  = +(rowValues[iYear]);
-    index = year - 2001;
-
-    if (rowValues[iPrimType] == "THEFT" && rowValues[iDesc].indexOf('$500') != -1) {
-
-      if(rowValues[iDesc].toUpperCase().indexOf('UNDER') != -1){
-        arTheft[index]['THEFT $500 AND UNDER']++;
-        // console.log("THEFT $500 AND UNDER");
-      }else {
-        arTheft[index]['THEFT OVER $500']++;
-        // console.log("THEFT OVER $500");
-      }
-    }
-
-    if (rowValues[iPrimType] == "ASSAULT") {
-      if(rowValues[iArrest].toUpperCase().indexOf("TRUE") != -1){
-        arAssault[index]['ARRESTED']++;
-        // console.log("ASSAULT ARRESTED");
-      }else {
-        arAssault[index]['NOT ARRESTED']++;
-        // console.log("ASSAULT NOT ARRESTED");
-      }
+    switch (rowValues[indices.iPrimType]) {
+      case statics.theft:  (iFound = rowValues[indices.iDesc].toUpperCase().indexOf(statics.dollar500)) != -1 && ((iFound == 0) ? arTheft[index][statics.under500]++ : arTheft[index][statics.over500]++);
+                    break;
+      case statics.assault: (rowValues[indices.iArrest].toUpperCase().indexOf("TRUE") != -1) ? arAssault[index][statics.arrested]++ : arAssault[index][statics.notArrested]++;
+                    break;
     }
 
 });
