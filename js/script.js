@@ -1,4 +1,4 @@
-plotThefts = function(){
+var plotThefts = function(){
   var margin  = {
       top       : 20,
       right     : 20,
@@ -94,9 +94,7 @@ plotThefts = function(){
   });
 };
 
-
-
-plotAssaults = function(){
+var plotAssaults = function(){
   var margin  = {
     top     : 20,
     right   : 80,
