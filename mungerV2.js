@@ -1,6 +1,6 @@
 var readline        = require('readline'),
     fs              = require('fs'),
-    inputFilePath   = "Crimes_-_2001_to_present_1.csv",
+    inputFilePath   = "Crimes_-_2001_to_present.csv",
     theftFilePath   = "theft.json",
     assaultFilePath = "assault.json",
     lineCounter,
